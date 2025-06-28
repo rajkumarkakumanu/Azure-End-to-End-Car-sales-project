@@ -1,54 +1,59 @@
 # Azure-End-to-End-Car-sales-project
 ![architecture](https://github.com/user-attachments/assets/c07d1bbf-1b00-49d1-ae0d-59ac9a62a66b)
-# 🚗 Car Sales Data Engineering Pipeline
+# 🚗 Car Sales Data Engineering Pipeline (Medallion Architecture)
 
-This project is a modern data engineering solution for processing and analyzing **car sales data**, leveraging **Azure Data Services** and **Apache Spark**. It demonstrates both **direct** and **incremental data ingestion**, followed by transformations to build a **star schema** data model for business analytics.
+This project is a modern data engineering solution for processing and analyzing **car sales data**, built using **Azure services** and **Apache Spark** in **Databricks**. It follows the **Medallion Architecture** pattern—**Bronze, Silver, and Gold layers**—to ensure scalable, modular, and high-quality data pipelines.
+
+The pipeline supports both **direct (full)** and **incremental** data ingestion using a **watermark table** to track changes efficiently.
 
 ---
 
 ## 🔧 Technologies Used
 
-- **Azure Data Lake Storage Gen2 (ADLS Gen2)** – Raw and curated data storage
-- **Azure Data Factory (ADF)** – Orchestration of data movement and pipeline scheduling
-- **Azure SQL Database** – Final data warehouse for reporting and BI tools
-- **Azure Databricks** – Processing and transformation layer using PySpark
-- **PySpark** – For scalable data transformations and model creation
+- **Azure Data Lake Storage Gen2 (ADLS Gen2)** – Storage for raw, curated, and analytics data
+- **Azure Data Factory (ADF)** – Orchestration of data movement and scheduling
+- **Azure SQL Database** – Final data warehouse for serving BI/reporting
+- **Azure Databricks** – Transformation and data modeling using PySpark
+- **PySpark** – Distributed data processing
+- **Medallion Architecture** – Layered data pipeline design (Bronze → Silver → Gold)
 
 ---
 
-## 📊 Project Architecture
+## 🧱 Architecture Overview
 
-### 1. **Data Ingestion**
-- Raw car sales data is fetched from the source and stored in **ADLS Gen2**.
-- Two data ingestion strategies are used:
-  - **Direct Load**: Initial full load of historical car sales data
-  - **Incremental Load**: Fetches only new or updated records based on a  **watermark table**
+### ✅ Medallion Architecture Layers
 
-### 2. **Transformation (Curated Layer)**
-- Data is cleaned, validated, and transformed using **Databricks notebooks** with **PySpark**
-- Business logic is applied to prepare the data for analytical modeling
+- **🟫 Bronze Layer** (Raw):
+  - Ingest raw car sales data from source
+  - Store unprocessed records for auditing and traceability
 
-### 3. **Data Modeling (Star Schema)**
-- Transformed data is organized into:
-  - 🧮 **Fact_Sales**
-  - 🚘 **Dim_Model**
-  - 🏬 **Dim_Branch**
-  - 📆 **Dim_Date**
-  - 🧑‍💼 **Dim_Dealer**
+- **⬜ Silver Layer** (Cleaned/Transformed):
+  - Clean and validate data using PySpark
+  - Join reference data
+  - Handle schema evolution and null checks
 
-### 4. **Incremental Data Handling**
-- After the initial pipeline run, the system supports **incremental updates**:
-  - Uses a watermark table to detect and load only new or changed records
-  - Supports **upserts** to the dimension and fact tables
-  - Maintains data freshness without reprocessing the full dataset
+- **🟨 Gold Layer** (Analytics/Model):
+  - Create star schema models for reporting
+  - Build and maintain:
+    - 🧮 `Fact_Sales`
+    - 🚘 `Dim_Model`
+    - 🧑‍💼 `Dim_Dealer`
+    - 📆 `Dim_Date`
+    - 🏬 `Dim_Branch`
 
-### 5. **Data Loading**
-- Transformed and modeled data is written to **Azure SQL Database**
-- Loaded data is ready for analysis and visualization through BI tools
+---
+
+## 🔁 Incremental Load with Watermark Table
+
+- A **watermark table** is maintained in **Azure SQL Database** to track the latest processed timestamp for each data source.
+- During each run, only records **newer than the last watermark** are processed (CDC-style).
+- After successful processing, the watermark is updated to ensure accurate future loads.
+- Supports **idempotent transformations** and **upserts** to target tables.
 
 ---
 
 ## 📁 Directory Structure
+
 
 
 
